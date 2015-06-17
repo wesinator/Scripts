@@ -135,8 +135,6 @@ if __name__ == "__main__":
 		pretty_print(a_group)
 
 
-	print
-
 	if results.a_group:	
 		print '\x1b[%sm%s\x1b[0m' % (';'.join(['1']), str(len(a_group))), "\tcommon string found between all files in A group"
 		
