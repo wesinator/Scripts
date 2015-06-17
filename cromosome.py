@@ -141,7 +141,7 @@ if __name__ == "__main__":
 		print '\x1b[%sm%s\x1b[0m' % (';'.join(['1']), str(len(a_group))), "\tcommon string found between all files in A group"
 		
 	if results.b_group:
-		print '\x1b[%sm%s\x1b[0m' % (';'.join(['1']), str(len(b_group))), "\tdifferent strings found in B group"
+		print '\x1b[%sm%s\x1b[0m' % (';'.join(['1']), str(len(b_group))), "\tunion strings found in B group"
 	
 	if results.a_group and results.b_group:
 		print '\x1b[%sm%s\x1b[0m' % (';'.join(['1']), str(len(a_group - b_group))), "\tstring from A group not present in B group" 
