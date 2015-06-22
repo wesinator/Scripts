@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 header = \
     """
-----------------------------Koodous Script Manage----------------------------------
+--------------Koodous Script Manage--------------------
 Url:\t\thttps://koodous.com
 Twitter:\t@koodous_project
 Author:\t\tframirez@koodous.com
 \t\t2015
+Get your TOKEN --> https://koodous.com/settings/profile
 
 """
 
@@ -124,6 +125,17 @@ class wmup:
 
 
 if __name__ == '__main__':
+                                #All is done - upload to VT
+    status_response = {
+    				200: "All is done",
+    				201: "Created",
+                    415: "It,s not a apk",
+                	412: "Policy exception",
+	      			408: "The url is lapsed",
+	      			409: "Apk already exist in our database",
+	      			401: "Invalid token",
+	      			429: "Api limit reached"
+	      			}
     print header
     parser = \
         argparse.ArgumentParser(description='Script for upload and download files to Koodous')
@@ -161,24 +173,19 @@ if __name__ == '__main__':
                 try:
                     print 'Uploading %s' % (results.path + row)
                     code = a.upload(results.path + row)
-                    if code in [200, 201]:
-                        print 'Upload sucessfully'
-                    elif code is 409:
-                        print 'The file is stored in Koodous database'
-                    else:
-                        print 'Code: %i' % code
+                    print status_response[code]
+                    if code is 429:
+                    	print "Sleeping %i seconds for api reached" % 60
+                    	time.sleep(60)
+
                 except Exception, error:
                     print 'Error upload %s' % error
         elif results.file is not None:
 
             print 'Uploading %s' % results.file
             code = a.upload(results.file)
-            if code in [200, 201]:
-                print 'Upload sucessfully'
-            elif code is 409:
-                print 'The file is stored in Koodous database'
-            else:
-                print 'Code: %i' % code
+            print status_response[code]
+
         else:
             print 'You need specify file to upload [-f] or path [-p]'
     elif results.action == 'download':
@@ -189,6 +196,8 @@ if __name__ == '__main__':
             print 'Downloading %s in %s' % (results.sha256,
                     results.file)
             code = a.download(results.sha256, results.file)
+            print status_response[code]
+
         else:
 
             print 'You need specify sha256 to download [-s]'
