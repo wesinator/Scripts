@@ -4,7 +4,7 @@ header = \
     """
 ----------------------------Koodous Script Manage----------------------------------
 Url:\t\thttps://koodous.com
-Twitter:\t@koodous
+Twitter:\t@koodous_project
 Author:\t\tframirez@koodous.com
 \t\t2015
 
