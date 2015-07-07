@@ -1,3 +1,21 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+Copyright (c) 2015. The Koodous Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+
 help_description="""
 
 	The script will look for all the common strings between files in A group and
@@ -36,7 +54,7 @@ def get_file_type(file_name):
 
 def is_zip_file(file_name):
 	file_type = get_file_type(file_name)
-	is_zip = "Zip archive data" in file_type
+	is_zip = "Zip" in file_type
 
 	return is_zip
 
@@ -79,11 +97,12 @@ def process_group(file_list, files_include, operation_type, min_string_length):
 	group_strings = []
 	
 	for file_name in file_list:
-		if is_zip_file(file_name):
+#		if is_zip_file(file_name):
+		try:
 			file_strings = get_zip_files_strings(file_name, \
 				files_include, min_string_length)
-
-		else:
+		except:
+#		else:
 			print '\x1b[%sm%s\x1b[0m' % (';'.join(['32']), file_name), " Get the strings"
 
 			file_strings = strings(file_name, min_string_length)
