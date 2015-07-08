@@ -37,6 +37,7 @@ import string
 import zipfile
 import argparse
 import tempfile
+import re
 
 def get_file_type(file_name):
 	file_type = ""
@@ -73,25 +74,26 @@ def get_zip_files_strings(zip_file, files_include, min_string_length):
 	print '\x1b[%sm%s\x1b[0m' % (';'.join(['32']), zip_file), " UnZipping file and get the strings"
 
 	found_strings = []
-	out_path = tempfile.mkdtemp()
+	content = ""
+	with open(zip_file, 'rb') as fh:
+		content = fh.read()
+		fh.close()
 
-	fh = open(zip_file, 'rb')
-	z = zipfile.ZipFile(fh)
-
-	for name in z.namelist():
-		if name.endswith('/'):
-			os.makedirs("%s/%s" % (out_path, name))
-		z.extract(name, out_path)
-		
-		if not name.endswith('/'):
-			if files_include is None or name in files_include:
-				found_strings += strings("%s/%s" % (out_path, name), min_string_length)
-
-	fh.close()
-
-	shutil.rmtree(out_path)
 	
-	return found_strings
+	zipped = zipfile.ZipFile(zip_file)
+	for name in zipped.namelist():
+	
+		if files_include is None or name in files_include:
+			content += ' ' + zipped.read(name)
+
+	strings = re.findall("[\x1f-\x7e]{%s,}" % min_string_length, content)
+	strings += [str(ws.decode("utf-16le")) for ws in re.findall("(?:[\x1f-\x7e][\x00]){%s,}" % min_string_length, content)]
+	
+	return strings
+
+
+
+
 
 def process_group(file_list, files_include, operation_type, min_string_length):
 	group_strings = []
@@ -101,8 +103,9 @@ def process_group(file_list, files_include, operation_type, min_string_length):
 		try:
 			file_strings = get_zip_files_strings(file_name, \
 				files_include, min_string_length)
-		except:
+		except Exception, e:
 #		else:
+			print e
 			print '\x1b[%sm%s\x1b[0m' % (';'.join(['32']), file_name), " Get the strings"
 
 			file_strings = strings(file_name, min_string_length)
