@@ -57,17 +57,20 @@ def main():
     report2 = download_report(args.hash2, args.token)
     try:
         perms1 = report1.get('permissions')
-        #print report2
         perms2 = report2.get('permissions')
+        package1 = report1.get('package_name', '')
+        package2 = report2.get('package_name', '')
         commons = list(set(perms1) & set(perms2))        
         print "\n***** Common permissions *****"
         for perm in commons:
             print GREEN + perm
-        print ENDC + "\n***** Permissions only for hash1 *****"
+        print ENDC + "\n***** Permissions only for first APK (%s)*****" % \
+                                                                    package1
         for perm in perms1:
             if perm not in commons:
                 print ORANGE + perm
-        print ENDC + "\n***** Permissions only for hash2 *****"
+        print ENDC + "\n***** Permissions only for second APK (%s)*****" % \
+                                                                    package2
         for perm in perms2:
             if perm not in commons:
                 print BLUE + perm
