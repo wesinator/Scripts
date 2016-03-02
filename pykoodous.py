@@ -92,8 +92,8 @@ class wmup:
 
 		return r.status_code
 
-	def search_koodous_db(self, term):
-		url = self.URL % ('apks', '?search=', term)
+	def search_koodous_db(self, term, page=1, page_size=100):
+		url = self.URL % ('apks', '?search=%s&page=%i&page_size=%i' % (term, page, page_size), "" )
 		return requests.get(url=url, headers=self.headers)
 
 
@@ -163,6 +163,35 @@ class wmup:
 		url = self.URL % ('ruleset_matches/', ruleset_id, '/apks?page=%s&page_size=%s' % (page, page_size))
 		return requests.get(url, headers=self.headers)
 
+	def analyze(self, sha256):
+		"""
+			Send to analyze
+		"""
+		url = self.URL % ('apks/', sha256, '/analyze')
+		return requests.get(url, headers=self.headers)
+
+	def get_analysis(self, sha256):
+		"""
+			Get the analysis from APK
+			#not for CLI
+		"""
+		url = self.URL % ('apks/', sha256, '/analysis')
+		return requests.get(url, headers=self.headers)	
+
+	def get_info(self, sha256):
+		"""
+			Get info for apk
+		"""
+		url = self.URL % ('apks/', sha256, '')
+		return requests.get(url, headers=self.headers)
+
+	def get_metadata(self, sha256):
+		"""
+			Get metadata for apk
+		"""
+		url = self.URL % ('apks/', sha256, '/metadata')
+		return requests.get(url, headers=self.headers)		
+
 
 if __name__ == '__main__':
 	def upload_script(row):
@@ -190,7 +219,7 @@ if __name__ == '__main__':
 
 	parser.add_argument('action', action='store',
 						help='upload | download | checkApk | tag | vote | comment | follow \
-						check ')
+						check | get_info | metadata')
 	parser.add_argument('-s', '--sha256', dest='sha256',
 						help='hash for file', default=None)
 	parser.add_argument('-p', '--path', dest='path',
@@ -209,8 +238,9 @@ if __name__ == '__main__':
 						default=None)
 	parser.add_argument('-m', '--md5', dest='md5', help='md5',
 						default=None)
-
 	parser.add_argument('-T', '--token', dest='token', help='token',
+						default=None)
+	parser.add_argument('-M', '--magic_word', dest='magic', help='Magic Thrick',
 						default=None)
 	args = parser.parse_args()
 	results = parser.parse_args()
@@ -307,3 +337,23 @@ if __name__ == '__main__':
 
 		else:
 			print 'you need specify sha256 [-s] or sha1 [-sha1] or md5 [-m]'		
+
+	elif results.action == 'get_info':
+		if results.sha256 is not None:
+			if results.magic is not None:
+				print a.get_info(results.sha256).json().get(results.magic)
+			else:
+				print a.get_info(results.sha256).text
+
+	elif results.action == 'get_metadata':
+		if results.sha256 is not None:
+			if results.magic is not None:
+				mt = a.get_metadata(results.sha256)
+				if mt.json().get(results.magic):
+					print mt.json().get(results.magic)
+				else:
+					for row in mt.json().get('info'):
+						if row.get(results.magic):
+							print row[results.magic]
+			else:
+				print a.get_metadata(results.sha256).text
