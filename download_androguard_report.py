@@ -21,31 +21,24 @@ import json
 
 __author__ = 'A.Sánchez <asanchez@koodous.com>'
 
-TOKEN = '' #Register at https://koodous.com to obtain your token
 
-
-def download_report(sha256, dst, token):
+def download_report(sha256, dst):
     """
         Function to download and save the Androguard report from Koodous.
     """
 
     url = 'https://koodous.com/api/apks/%s/analysis' % sha256
     data = dict()
-    response = requests.get(url=url, 
-                       headers = {"Authorization": "Token %s" % token})
+    response = requests.get(url=url)
 
-    if response.status_code == 401:
-        print 'You must provide you token access in the script (register in Koodous, it\'s free!'
-        return False
     if response.status_code == 404:
         #Exists this APK in Koodous?
-        response2 = requests.get(url='https://koodous.com/apks/%s' % sha256,
-                                headers = {"Authorization": "Token %s" % token})
+        response2 = requests.get(url='https://koodous.com/apks/%s' % sha256)
         if response2.status_code == 404:
             print 'Sorry, we haven\'t this APK in Koodous. You can share with community through our website.'
             return False
         else:
-            print "Sorry, this APK has no report yet, you can requests it via Koodous website."
+            print "Sorry, this APK has no report yet, you can requests it via Koodous website under free registration."
             return False
 
     data = response.json()
@@ -65,12 +58,8 @@ def main():
 
     args = parser.parse_args()
 
-    if len(TOKEN) == 0:
-        print 'You must provide you token access in the script (register in Koodous, it\'s free!'
-        return
-
     if not args.sha256:
-        print "I need at least a SHA256 hash!"
+        print "I need at least the SHA256 hash!"
         parser.print_help()
         return
 
@@ -79,7 +68,7 @@ def main():
         report_name = args.filename
 
 
-    success = download_report(sha256=args.sha256, dst=report_name, token=TOKEN)
+    success = download_report(sha256=args.sha256, dst=report_name)
     if success:
         print 'Androguard report saved in %s' % report_name
 
