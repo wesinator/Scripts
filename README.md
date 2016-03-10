@@ -1,5 +1,43 @@
 # Scripts
 In the next lines we want to explain the different scripts in this repository and their utility.
+
+## cromosome.py
+This script works with 2 groups, one of them is the "goodware" group, and the another one the "malware" group. 
+
+Usually, we put well known goodware applications in a folder called **group_b** and the malware samples in another folder called **group_a** and then execute the script:
+```
+$ ./cromosome.py -a group_a/* -b group_b/*
+```
+
+This generate a list of strings that contains the malware and don't found in goodware applications:
+```
+default_image_banner
+%Lcom/master/sdknew/xser/SDKService$6;
+Lcom/ironsource/mobilcore/o;
+Lcom/google/android/gms/ads/e;
+5Lcom/google/android/gms/games/internal/multiplayer/a;
+reportImpressions
+!Lcom/master/sdknew/helper/PLNoti;
+...
+...
+mainText
+REPORT_ACTION_QUIT
+bZ@p%h}<
+shortcut webView = null
+next_time_show_
+4com.ironsource.mobilcore.extra_download_app_img_name
+.?1vlg\W
+%[Lcom/google/android/gms/internal/ci;
+not_ready
+
+6771    common string found between all files in A group
+1044287     union strings found in B group
+2608    string from A group not present in B grou
+```
+
+With a little sumary at the end.
+
+
 ## download_androguard_report.py
 This script, giving a sha256 hash download the androguard report from Koodous.
 
