@@ -11,6 +11,7 @@ import requests
 import time
 import os
 import sys
+from datetime import datetime, timedelta
 
 APKS_FOLDER = 'apks'
 ANALYSIS_FOLDER = 'analysis'
@@ -36,7 +37,10 @@ def create_folders():
         pass
 
 def retrieve_apks_feed(period):
-    res = requests.get("https://api.koodous.com/feed/apks", headers=header)
+    params = {}
+    if period == 60:
+        params= {"package": (datetime.utcnow() - timedelta(hours = 1)).strftime("%Y%m%dT%H")}
+    res = requests.get("https://api.koodous.com/feed/apks", headers=header, params=params)
     if res.status_code == 401:
         print ERROR_MSG
         sys.exit(0)
@@ -47,7 +51,10 @@ def retrieve_apks_feed(period):
                                             os.path.join(APKS_FOLDER, filename)
 
 def retrieve_analysis_feed(period):
-    res = requests.get("https://api.koodous.com/feed/analyses", headers=header)
+    params = {}
+    if period == 60:
+        params= {"package": (datetime.utcnow() - timedelta(hours = 1)).strftime("%Y%m%dT%H")}
+    res = requests.get("https://api.koodous.com/feed/analyses", headers=header, params=params)
     if res.status_code == 401:
         print ERROR_MSG
         sys.exit(0)
