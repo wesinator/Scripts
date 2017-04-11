@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 
 APKS_FOLDER = 'apks'
 ANALYSIS_FOLDER = 'analysis'
+DETECTED_FOLDER = 'detected'
 
 ERROR_MSG = """You have no permissions to use this feed.
 Please contact with support@koodous.com"""
@@ -33,6 +34,10 @@ def create_folders():
         pass
     try:
         os.mkdir(ANALYSIS_FOLDER)
+    except:
+        pass
+    try:
+        os.mkdir(DETECTED_FOLDER)
     except:
         pass
 
@@ -61,7 +66,20 @@ def retrieve_analysis_feed(period):
     filename = res.headers["Content-Disposition"].split("'")[-1]
     with open(os.path.join(ANALYSIS_FOLDER, filename), "wb") as fd:
         fd.write(res.content)
-    print "Downloaded analysis in %s" % os.path.join(ANALYSIS_FOLDER, filename)
+    print "Downloaded file %s with analyses" % os.path.join(ANALYSIS_FOLDER, filename)
+
+def retrieve_detected_feed(period):
+    params = {}
+    if period == 60:
+        params= {"package": (datetime.utcnow() - timedelta(hours = 1)).strftime("%Y%m%dT%H")}
+    res = requests.get("https://api.koodous.com/feed/detected", headers=header, params=params)
+    if res.status_code == 401:
+        print ERROR_MSG
+        sys.exit(0)
+    filename = res.headers["Content-Disposition"].split("'")[-1]
+    with open(os.path.join(DETECTED_FOLDER, filename), "wb") as fd:
+        fd.write(res.content)
+    print "Downloaded file %s with analyses of detected samples" % os.path.join(DETECTED_FOLDER, filename)
 
 def wait_minutes(minutes):
     for i in range(1, minutes+1):
@@ -70,17 +88,19 @@ def wait_minutes(minutes):
         print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
 
 def main():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Download Koodous feed.')
     parser.add_argument('period', type=int, help='period in minutes', 
                         choices=[5,60])
     parser.add_argument('--apks', dest='apks', action='store_true',
                         help="Download the zip with apks download link")
     parser.add_argument('--analysis', dest='analysis', action='store_true',
                         help="Download the zip with the analysis feed")
+    parser.add_argument('--detected', dest='detected', action='store_true',
+                        help="Download the zip with the detected feed")
     args = parser.parse_args()
 
     if not TOKEN or len(TOKEN) < 40:
-        print "Please, set a correct TOKEN in the script"
+        print "Please, set a correct TOKEN visiting https://koodous.com/settings/profile your profile and setting in the script"
         return
         
     create_folders()
@@ -89,6 +109,8 @@ def main():
             retrieve_apks_feed(args.period)
         if args.analysis:
             retrieve_analysis_feed(args.period)
+        if args.detected:
+            retrieve_detected_feed(args.period)
         print "Waiting for the next package"
 
         wait_minutes(args.period)
