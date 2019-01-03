@@ -28,7 +28,7 @@ WAITING_TIME = 5*60
 
 
 def send_to_another_system(rulename, sha256):
-    print "Sending %s from %s to my another big system" % (sha256, rulename)
+    print("Sending %s from %s to my another big system" % (sha256, rulename))
     time.sleep(1) #Simulating the time to send to another system
 
 def mark_as_read(id):
@@ -37,7 +37,7 @@ def mark_as_read(id):
                              headers={"Authorization": "Token %s" % TOKEN},
                              data={"read":True})
     except:
-        print "Unable to mark %s as read" % id
+        print("Unable to mark %s as read" % id)
 def main():
     while True:
 
